@@ -54,6 +54,9 @@ def run_config(config):
         "Accept-Language": "en",
     }  # Defaults for scrapy https://docs.scrapy.org/en/latest/topics/settings.html#default-request-headers
 
+    if os.getenv("COOKIE"):
+        headers.update("Cookie", os.getenv("COOKIE"))
+
     if os.getenv("CF_ACCESS_CLIENT_ID") and os.getenv("CF_ACCESS_CLIENT_SECRET"):
         headers.update(
             {

@@ -1,5 +1,5 @@
-FROM ubuntu:18.04
-LABEL maintainer="docsearch@algolia.com"
+FROM ubuntu:22.04
+LABEL maintainer="bitkill@github.com"
 
 WORKDIR /root
 
@@ -14,14 +14,14 @@ RUN chgrp -R seleuser /home/seleuser
 
 RUN apt-get update -y && apt-get install -yq \
     software-properties-common\
-    python3.7
+    python3.10
 RUN add-apt-repository -y ppa:openjdk-r/ppa
 RUN apt-get update -y && apt-get install -yq \
     curl \
     wget \
     sudo \
     gnupg \
-    && curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
+    && curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
 RUN apt-get update -y && apt-get install -yq \
     nodejs -yq
 RUN apt-get update -y && apt-get install -yq \
@@ -32,17 +32,40 @@ RUN apt-get update -y && apt-get install -yq \
   default-jdk
 
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable for references around the latest versions
-RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
-RUN echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
-RUN apt-get update -y && apt-get install -yq \
-  google-chrome-stable=91.0.4472.114-1 \
-  unzip
-RUN wget -q https://chromedriver.storage.googleapis.com/91.0.4472.101/chromedriver_linux64.zip
-RUN unzip chromedriver_linux64.zip
+ARG CHROME_VERSION="google-chrome-stable"
+ARG TARGETARCH
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor | tee /etc/apt/trusted.gpg.d/google.gpg >/dev/null \
+  && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+  && apt-get update -qqy \
+  && if echo "${CHROME_VERSION}" | grep -qE "google-chrome-stable[_|=][0-9]*"; \
+    then \
+      CHROME_VERSION=$(echo "$CHROME_VERSION" | tr '=' '_') \
+      && wget -qO google-chrome.deb "https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/${CHROME_VERSION}_$(dpkg --print-architecture).deb" \
+      && apt-get -qqy --no-install-recommends install --allow-downgrades ./google-chrome.deb \
+      && rm -rf google-chrome.deb ; \
+    else \
+      apt-get -qqy --no-install-recommends install ${CHROME_VERSION} ; \
+    fi \
+  && rm /etc/apt/sources.list.d/google-chrome.list \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
-RUN mv chromedriver /usr/bin/chromedriver
-RUN chown root:root /usr/bin/chromedriver
-RUN chmod +x /usr/bin/chromedriver
+# https://googlechromelabs.github.io/chrome-for-testing/
+RUN DRIVER_ARCH=$(if [ "$(dpkg --print-architecture)" = "amd64" ]; then echo "linux64"; else echo "linux-aarch64"; fi) \
+    && CHROME_MAJOR_VERSION=$(google-chrome --version | sed -E "s/.* ([0-9]+)(\.[0-9]+){3}.*/\1/") \
+    && CHROME_DRIVER_VERSION=$(wget -qO- https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${CHROME_MAJOR_VERSION} | sed 's/\r$//') \
+    && CHROME_DRIVER_URL=https://storage.googleapis.com/chrome-for-testing-public/$CHROME_DRIVER_VERSION/${DRIVER_ARCH}/chromedriver-${DRIVER_ARCH}.zip \
+    && echo "Using ChromeDriver from: "$CHROME_DRIVER_URL \
+    && echo "Using ChromeDriver version: "$CHROME_DRIVER_VERSION \
+    && wget --no-verbose -O /tmp/chromedriver_${DRIVER_ARCH}.zip $CHROME_DRIVER_URL \
+    && unzip /tmp/chromedriver_${DRIVER_ARCH}.zip -d /usr/bin/chromedriver \
+    && rm /tmp/chromedriver_${DRIVER_ARCH}.zip
+    #&& wget -q https://chromedriver.storage.googleapis.com/91.0.4472.101/chromedriver_linux64.zip
+
+# RUN unzip chromedriver_linux64.zip
+
+# RUN mv chromedriver /usr/bin/chromedriver
+# RUN chown root:root /usr/bin/chromedriver
+# RUN chmod +x /usr/bin/chromedriver
 
 RUN wget -q https://selenium-release.storage.googleapis.com/3.13/selenium-server-standalone-3.13.0.jar
 RUN wget -q http://www.java2s.com/Code/JarDownload/testng/testng-6.8.7.jar.zip
@@ -58,4 +81,4 @@ ENV PIPENV_HIDE_EMOJIS 1
 RUN apt-get update -y && apt-get install -yq \
     python3-pip
 RUN pip3 install pipenv
-RUN pipenv install --python 3.6
+RUN pipenv install 

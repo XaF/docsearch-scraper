@@ -1,4 +1,4 @@
-FROM algolia/docsearch-scraper-base
+FROM ghcr.io/bitkill/docsearch-scraper-base:latest
 LABEL maintainer="docsearch@algolia.com"
 
 WORKDIR /root
