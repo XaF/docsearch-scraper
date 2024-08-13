@@ -21,6 +21,7 @@ RUN apt-get update -y && apt-get install -yq \
     wget \
     sudo \
     gnupg \
+    jq \
     && curl -sL https://deb.nodesource.com/setup_18.x | sudo bash -
 RUN apt-get update -y && apt-get install -yq \
     nodejs -yq

@@ -34,20 +34,20 @@ jobs:
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
 
-      - name: Build and push
+      - name: Build and push base image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./scraper/dev/docker/Dockerfile.base
           platforms: linux/amd64 # chrome does not support arm64
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}-base:${{ github.run_number }},ghcr.io/${{ github.repository_owner }}/${{ github.repository }}-base:latest
+          tags: ghcr.io/${{ github.repository }}-base:${{ github.run_number }},ghcr.io/${{ github.repository }}-base:latest
 
-      - name: Build and push
+      - name: Build and push final image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./scraper/dev/docker/Dockerfile
           platforms: linux/amd64 # chrome does not support arm64
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ github.run_number }},ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest
+          tags: ghcr.io/${{ github.repository }}:${{ github.run_number }},ghcr.io/${{ github.repository }}:latest
