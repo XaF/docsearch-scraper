@@ -1,5 +1,5 @@
 FROM ghcr.io/bitkill/docsearch-scraper-base:latest
-LABEL maintainer="docsearch@algolia.com"
+LABEL maintainer="bitkill@github.com"
 
 WORKDIR /root
 COPY scraper/src ./src
