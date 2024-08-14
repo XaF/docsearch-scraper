@@ -21,4 +21,4 @@ Twisted = "==24.7.0"
 pylint = "==2.3.1"
 
 [requires]
-python_version = "3.11"
+python_version = "3.12"

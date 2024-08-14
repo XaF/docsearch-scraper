@@ -34,7 +34,6 @@ RUN apt-get update -y && apt-get install -yq \
 
 # https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable for references around the latest versions
 ARG CHROME_VERSION="google-chrome-stable"
-ARG TARGETARCH
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor | tee /etc/apt/trusted.gpg.d/google.gpg >/dev/null \
   && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
   && apt-get update -qqy \
@@ -60,13 +59,6 @@ RUN DRIVER_ARCH=$(if [ "$(dpkg --print-architecture)" = "amd64" ]; then echo "li
     && wget --no-verbose -O /tmp/chromedriver_${DRIVER_ARCH}.zip $CHROME_DRIVER_URL \
     && unzip /tmp/chromedriver_${DRIVER_ARCH}.zip -d /usr/bin/chromedriver \
     && rm /tmp/chromedriver_${DRIVER_ARCH}.zip
-    #&& wget -q https://chromedriver.storage.googleapis.com/91.0.4472.101/chromedriver_linux64.zip
-
-# RUN unzip chromedriver_linux64.zip
-
-# RUN mv chromedriver /usr/bin/chromedriver
-# RUN chown root:root /usr/bin/chromedriver
-# RUN chmod +x /usr/bin/chromedriver
 
 RUN wget -q https://selenium-release.storage.googleapis.com/3.13/selenium-server-standalone-3.13.0.jar
 RUN wget -q http://www.java2s.com/Code/JarDownload/testng/testng-6.8.7.jar.zip
