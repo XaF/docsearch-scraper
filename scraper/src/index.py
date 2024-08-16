@@ -54,9 +54,11 @@ def run_config(config):
         "Accept-Language": "en",
     }  # Defaults for scrapy https://docs.scrapy.org/en/latest/topics/settings.html#default-request-headers
 
+    # Custom cookie
     if os.getenv("COOKIE"):
-        headers.update("Cookie", os.getenv("COOKIE"))
+        headers.update({"Cookie": os.getenv("COOKIE").replace("\n",'')})
 
+    # Cloudflare Zero Trust (CF)
     if os.getenv("CF_ACCESS_CLIENT_ID") and os.getenv("CF_ACCESS_CLIENT_SECRET"):
         headers.update(
             {
@@ -64,6 +66,7 @@ def run_config(config):
                 "CF-Access-Client-Secret": os.getenv("CF_ACCESS_CLIENT_SECRET"),
             }
         )
+    # Google Identity-Aware Proxy (IAP)
     elif os.getenv("IAP_AUTH_CLIENT_ID") and os.getenv("IAP_AUTH_SERVICE_ACCOUNT_JSON"):
         iap_token = IAPAuth(
             client_id=os.getenv("IAP_AUTH_CLIENT_ID"),
