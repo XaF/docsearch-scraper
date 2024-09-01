@@ -1,0 +1,43 @@
+name: 'DocSearch Crawler'
+description: 'Algolia DocSearch Scraper in Docker, which also supports private static sites'
+branding:
+  icon: 'search'
+  color: 'purple'
+inputs:
+  application_id:
+    description: 'Algolia docsearch APPLICATION_ID'
+    required: true
+  write_api_key:
+    description: 'Algolia docsearch API_KEY for write operations'
+    required: true
+  config_file:
+    description: 'Algolia docsearch configuration file (default: algolia.json)'
+    required: false
+  build_dir:
+    description: 'Directory of the static site build (default: build)'
+    required: false
+  override_host:
+    description: 'Comma-separated list of hostnames to override the DNS resolution for the local Docker container'
+    required: false
+outputs:
+  pages_with_errors_count:
+    description: 'The number of pages where the scraper encountered an error'
+  pages_with_errors:
+    description: 'The list of pages where the scraper encountered an error'
+  pages_without_record_count:
+    description: 'The number of pages where the scraper did not find any record'
+  pages_without_record:
+    description: 'The list of pages where the scraper did not find any record'
+  too_big_records_count:
+    description: 'The number of records that are too big to be pushed to the Algolia index'
+  total_records:
+    description: 'The total number of records pushed to the Algolia index'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+    APPLICATION_ID: ${{ inputs.application_id }}
+    ALGOLIA_API_KEY: ${{ inputs.write_api_key }}
+    CONFIG_FILE: ${{ inputs.config_file }}
+    BUILD_DIR: ${{ inputs.build_dir }}
+    OVERRIDE_HOST: ${{ inputs.override_host }}

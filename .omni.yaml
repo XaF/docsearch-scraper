@@ -1,0 +1,4 @@
+commands:
+  release:
+    desc: 'Release a new version'
+    run: ./scripts/push-version.sh "$@"

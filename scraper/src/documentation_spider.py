@@ -179,7 +179,7 @@ class DocumentationSpider(CrawlSpider, SitemapSpider):
         else:
             print("\033[94m> Ignored: from start url\033[0m " + response.url)
 
-        return self.parse(response)
+        return self._parse(response)
 
     def is_rules_compliant(self, response):
 

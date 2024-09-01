@@ -27,22 +27,25 @@ class AbstractStrategy:
 
     @staticmethod
     def get_body(response):
+        """Get the body of the webpage"""
+        body = response.body
         try:
-            body = response.body.decode(response.encoding)
-            return body
+            body = body.decode(response.encoding)
         except (UnicodeError, ValueError, AttributeError):
-            return response.body
+            pass
+
+        # Clear out potential null bytes... or we lose contents
+        try:
+            body = body.replace('\x00', '')
+        except TypeError:
+            pass
+
+        return body
 
     @staticmethod
     def get_dom(response):
         """Get the DOM representation of the webpage"""
-        try:
-            body = response.body.decode(response.encoding)
-            result = lxml.html.fromstring(body)
-        except (UnicodeError, ValueError):
-            result = lxml.html.fromstring(response.body)
-
-        return result
+        return lxml.html.fromstring(AbstractStrategy.get_body(response))
 
     def get_strip_chars(self, level, selectors):
         if selectors[level]['strip_chars'] is None:

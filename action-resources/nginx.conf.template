@@ -1,0 +1,31 @@
+worker_processes auto;  # Automatically sets the number of worker processes
+
+events {
+    worker_connections 1024;  # Maximum number of connections per worker
+}
+
+http {
+    # include       mime.types;  # Include MIME types
+    # default_type  application/octet-stream;
+
+    sendfile        on;  # Enable sendfile for better performance
+    tcp_nopush      on;  # Improve performance for large file transfers
+    tcp_nodelay     on;  # Reduce latency by sending data as soon as it is available
+    keepalive_timeout  65;  # Keep the connection alive for 65 seconds
+
+    server {
+        listen [SERVE_PORT];  # Listen on port for HTTP requests
+        server_name _;  # Default server, catches all requests
+
+        # Root directory for serving static files
+        root [GITHUB_WORKSPACE]/build;
+
+        # Serve index.html as the default file
+        index index.html;
+
+        # Location block to serve all files from the root directory
+        location / {
+            try_files $uri $uri/ =404;  # Try to serve files, return 404 if not found
+        }
+    }
+}
