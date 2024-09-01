@@ -1,7 +1,10 @@
-FROM algolia/docsearch-scraper-base
-LABEL maintainer="docsearch@algolia.com"
+FROM ghcr.io/bitkill/docsearch-scraper-base:latest
+LABEL maintainer="bitkill@github.com"
 
-WORKDIR /root
+WORKDIR /home/seleuser
+USER 1000
+COPY scraper/src ./src
+
 COPY scraper/src ./src
 
 ENTRYPOINT ["pipenv", "run", "python", "-m", "src.index"]
