@@ -1,8 +1,8 @@
 name: Docker Buildx & Publish Image
 
-on:
-  push:
-    branches: [ master ]
+# on:
+  # push:
+    # branches: [ master ]
 
 permissions:
   id-token: write
@@ -30,14 +30,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-      
+
       - name: "Cache docker layers"
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-buildx-       
+            ${{ runner.os }}-buildx-
 
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
