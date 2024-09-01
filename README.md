@@ -8,6 +8,9 @@ This means that this scraper can actually work with private GitHub repositories,
 a static website as built into a given build directory, instead of requiring a publicly-available webpage
 to scrape.
 
+Note: I do not intend to maintain the scraper itself. This is a best effort repository to make the scraper
+work with GitHub Actions.
+
 ## Usage
 
 ### Workflow
